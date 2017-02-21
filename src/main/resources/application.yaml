@@ -1,0 +1,5 @@
+cf:
+  host: api.bosh-lite.com
+  user: admin
+  password: admin
+  skipSslValidation: true
