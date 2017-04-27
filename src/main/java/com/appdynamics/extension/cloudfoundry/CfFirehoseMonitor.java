@@ -7,11 +7,15 @@ import com.singularity.ee.agent.systemagent.api.AManagedMonitor;
 import com.singularity.ee.agent.systemagent.api.TaskExecutionContext;
 import com.singularity.ee.agent.systemagent.api.TaskOutput;
 import com.singularity.ee.agent.systemagent.api.exception.TaskExecutionException;
+import org.apache.log4j.ConsoleAppender;
 import org.apache.log4j.Logger;
-import org.springframework.boot.SpringApplication;
+import org.apache.log4j.PatternLayout;
 
+import java.io.OutputStreamWriter;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CountDownLatch;
 
 /**
  * @author Satish Muddam
@@ -38,29 +42,58 @@ public class CfFirehoseMonitor extends AManagedMonitor {
         }
         logger.debug(String.format("The raw arguments are %s", taskArgs));
         configuration.executeTask();
+
+
+        //As this is continuous extension, make this thread wait indefinitely.
+        CountDownLatch infiniteWait = new CountDownLatch(1);
+        try {
+            infiniteWait.await();   //Will make this thread to wait till the CountDownLatch reaches to 0.
+        } catch (InterruptedException e) {
+            logger.error("Failed to wait indefinitely ", e);
+        }
+
         logger.info("CfFirehoseMonitor monitor run completed successfully.");
         return new TaskOutput("CfFirehoseMonitor monitor run completed successfully.");
     }
 
-    private void initialize(Map<String, String> taskArgs) {
+    private void initialize(Map<String, String> argsMap) {
 
-        final String configFilePath = taskArgs.get(CONFIG_ARG);
-        MetricWriteHelper metricWriteHelper = MetricWriteHelperFactory.create(this);
-        MonitorConfiguration conf = new MonitorConfiguration(METRIC_PREFIX, new TaskRunnable(), metricWriteHelper);
-        conf.setConfigYml(configFilePath);
-        conf.checkIfInitialized(MonitorConfiguration.ConfItem.CONFIG_YML, MonitorConfiguration.ConfItem.EXECUTOR_SERVICE,
-                MonitorConfiguration.ConfItem.METRIC_PREFIX, MonitorConfiguration.ConfItem.METRIC_WRITE_HELPER);
-        CfFirehoseMonitor.configuration = conf;
+        if (!initialized) {
+            final String configFilePath = argsMap.get(CONFIG_ARG);
 
-        SpringApplication.run(CfFirehoseMonitorTask.class, new String[]{});
+            MetricWriteHelper metricWriteHelper = MetricWriteHelperFactory.create(this);
+            MonitorConfiguration conf = new MonitorConfiguration(METRIC_PREFIX, new TaskRunnable(), metricWriteHelper);
+            conf.setConfigYml(configFilePath);
 
-        initialized = true;
+            conf.checkIfInitialized(MonitorConfiguration.ConfItem.CONFIG_YML, MonitorConfiguration.ConfItem.METRIC_PREFIX,
+                    MonitorConfiguration.ConfItem.METRIC_WRITE_HELPER, MonitorConfiguration.ConfItem.EXECUTOR_SERVICE);
+            this.configuration = conf;
+            initialized = true;
+        }
     }
 
 
     private class TaskRunnable implements Runnable {
+
         public void run() {
-            logger.info("Executing periodic run of CfFirehoseMonitor.");
+            if (!initialized) {
+                logger.info("CfFirehoseMonitor Monitor is still initializing");
+                return;
+            }
+
+            Map<String, ?> config = configuration.getConfigYml();
+
+            List<Map> cfs = (List<Map>) config.get("cf");
+
+            if (cfs == null || cfs.isEmpty()) {
+                logger.error("No CF servers configured in config.yml");
+                return;
+            }
+
+            for (Map cf : cfs) {
+                CfFirehoseMonitorTask task = new CfFirehoseMonitorTask(configuration, cf);
+                configuration.getExecutorService().execute(task);
+            }
         }
     }
 
@@ -75,6 +108,12 @@ public class CfFirehoseMonitor extends AManagedMonitor {
     }
 
     public static void main(String[] args) throws TaskExecutionException {
+
+        ConsoleAppender ca = new ConsoleAppender();
+        ca.setWriter(new OutputStreamWriter(System.out));
+        ca.setLayout(new PatternLayout("%-5p [%t]: %m%n"));
+
+        logger.getRootLogger().addAppender(ca);
 
 
         CfFirehoseMonitor monitor = new CfFirehoseMonitor();

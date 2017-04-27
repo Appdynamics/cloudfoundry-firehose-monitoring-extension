@@ -1,45 +1,58 @@
 package com.appdynamics.extension.cloudfoundry;
 
+import com.appdynamics.extension.cloudfoundry.config.CfProperties;
+import com.appdynamics.extension.cloudfoundry.config.FirehoseClientConfiguration;
 import com.appdynamics.extensions.conf.MonitorConfiguration;
-import org.cloudfoundry.doppler.DopplerClient;
+import org.apache.log4j.Logger;
 import org.cloudfoundry.doppler.Envelope;
 import org.cloudfoundry.doppler.EventType;
 import org.cloudfoundry.doppler.FirehoseRequest;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.CommandLineRunner;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.stereotype.Component;
+import org.cloudfoundry.reactor.DefaultConnectionContext;
+import org.cloudfoundry.reactor.doppler.ReactorDopplerClient;
+import org.cloudfoundry.reactor.tokenprovider.PasswordGrantTokenProvider;
 import reactor.core.publisher.Flux;
 
+import java.util.Map;
 import java.util.UUID;
 
 /**
  * @author Satish Muddam
  */
 
-@SpringBootApplication
-@Component
-public class CfFirehoseMonitorTask implements CommandLineRunner {
+public class CfFirehoseMonitorTask implements Runnable {
 
-    @Autowired
-    private DopplerClient dopplerClient;
-
+    private static final Logger logger = Logger.getLogger(CfFirehoseMonitorTask.class);
 
     private MonitorConfiguration monitorConfiguration;
+    private Map cf;
 
-    public void setMonitorConfiguration(MonitorConfiguration monitorConfiguration) {
-        this.monitorConfiguration = monitorConfiguration;
+    public CfFirehoseMonitorTask(MonitorConfiguration configuration, Map cf) {
+        this.cf = cf;
+        this.monitorConfiguration = configuration;
     }
 
     @Override
-    public void run(String... args) throws Exception {
+    public void run() {
 
-        Flux<Envelope> cfEvents = this.dopplerClient.firehose(
+        logger.info("Starting CfFirehoseMonitor Task");
+
+        CfProperties properties = new CfProperties();
+        properties.setHost((String) cf.get("host"));
+        properties.setUser((String) cf.get("user"));
+        properties.setPassword((String) cf.get("password"));
+        properties.setSkipSslValidation((Boolean) cf.get("skipSslValidation"));
+
+
+        DefaultConnectionContext connectionContext = FirehoseClientConfiguration.connectionContext(properties);
+        PasswordGrantTokenProvider tokenProvider = FirehoseClientConfiguration.tokenProvider(properties);
+        ReactorDopplerClient dopplerClient = FirehoseClientConfiguration.dopplerClient(connectionContext, tokenProvider);
+
+
+        Flux<Envelope> cfEvents = dopplerClient.firehose(
                 FirehoseRequest
                         .builder()
                         .subscriptionId(UUID.randomUUID().toString()).build());
 
-        cfEvents.filter(e -> e.getEventType().equals(EventType.VALUE_METRIC)).subscribe(new FirehoseConsumer(monitorConfiguration));
-
+        cfEvents.filter(e -> e.getEventType().equals(EventType.VALUE_METRIC)).subscribe(new FirehoseConsumer(monitorConfiguration.getMetricPrefix(), monitorConfiguration.getMetricWriter()));
     }
 }

@@ -1,8 +1,5 @@
 package com.appdynamics.extension.cloudfoundry.config;
 
-import org.springframework.boot.context.properties.ConfigurationProperties;
-
-@ConfigurationProperties(prefix = "cf")
 public class CfProperties {
     private String user;
     private String password;

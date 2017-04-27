@@ -6,7 +6,7 @@
     <monitor-configuration>
     </monitor-configuration>
     <monitor-run-task>
-        <execution-style>periodic</execution-style>
+        <execution-style>continuous</execution-style>
         <execution-frequency-in-seconds>60</execution-frequency-in-seconds>
         <name>CloudFoundry Firehose Monitor Run Task</name>
         <display-name>CloudFoundry Firehose Monitor Task</display-name>

@@ -1,6 +1,7 @@
 package com.appdynamics.extension.cloudfoundry;
 
-import com.appdynamics.extensions.conf.MonitorConfiguration;
+import com.appdynamics.extensions.util.MetricWriteHelper;
+import org.apache.log4j.Logger;
 import org.cloudfoundry.doppler.Envelope;
 import org.cloudfoundry.doppler.ValueMetric;
 
@@ -12,16 +13,20 @@ import java.util.function.Consumer;
  */
 public class FirehoseConsumer implements Consumer<Envelope> {
 
-    private MonitorConfiguration configuration;
+    private static final Logger logger = Logger.getLogger(FirehoseConsumer.class);
 
-    public FirehoseConsumer(MonitorConfiguration monitorConfiguration) {
-        this.configuration = monitorConfiguration;
+
+    private String metricPrefix;
+    private MetricWriteHelper metricWriteHelper;
+
+    public FirehoseConsumer(String metricPrefix, MetricWriteHelper metricWriteHelper) {
+        this.metricPrefix = metricPrefix;
+        this.metricWriteHelper = metricWriteHelper;
     }
 
     @Override
     public void accept(Envelope envelope) {
 
-        String origin = envelope.getOrigin();
         String deployment = envelope.getDeployment();
         String job = envelope.getJob();
 
@@ -30,18 +35,18 @@ public class FirehoseConsumer implements Consumer<Envelope> {
 
         ValueMetric valueMetric = envelope.getValueMetric();
 
+        String metricPath = metricPrefix + "|" + deployment + "|" + job + "|" + valueMetric.getName();
+
         if (valueMetric.value() == null) {
+            logger.debug(String.format("Ignoring metric [%s] with null value", metricPath));
             return;
         }
 
-        String metricPrefix = configuration.getMetricPrefix();
-        String metricPath = metricPrefix + "|" + origin + "|" + deployment + "|" + job + "|" + valueMetric.getName();
-
         BigDecimal bigDecimalVal = BigDecimal.valueOf(valueMetric.value());
 
-        configuration.getMetricWriter().printMetric(metricPath, bigDecimalVal, "OBS.CUR.COL");
+        logger.debug("Printing metric : " + metricPath + "  value : " + bigDecimalVal);
+        metricWriteHelper.printMetric(metricPath, bigDecimalVal, "OBS.CUR.COL");
 
-        System.out.println("Printing metric " + metricPath + "  value" + bigDecimalVal);
 
     }
 }

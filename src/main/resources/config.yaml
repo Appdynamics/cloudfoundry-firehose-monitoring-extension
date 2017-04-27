@@ -3,6 +3,12 @@
 
 #This will create it in specific Tier/Component. Make sure to replace <COMPONENT_ID> with the appropriate one from your environment.
 #To find the <COMPONENT_ID> in your environment, please follow the screenshot https://docs.appdynamics.com/display/PRO42/Build+a+Monitoring+Extension+Using+Java
-metricPrefix: Server|Component:<COMPONENT_ID>|Custom Metrics|CloudFoundry123456
+metricPrefix: Server|Component:<COMPONENT_ID>|Custom Metrics|CloudFoundry
 
 numberOfThreads : 2
+
+cf:
+  - host: api.bosh-lite.com
+    user: admin
+    password: admin
+    skipSslValidation: true
