@@ -1,8 +1,12 @@
 package com.appdynamics.extension.cloudfoundry;
 
+import com.appdynamics.TaskInputArgs;
 import com.appdynamics.extension.cloudfoundry.config.CfProperties;
 import com.appdynamics.extension.cloudfoundry.config.FirehoseClientConfiguration;
 import com.appdynamics.extensions.conf.MonitorConfiguration;
+import com.appdynamics.extensions.crypto.CryptoUtil;
+import com.google.common.base.Strings;
+import com.google.common.collect.Maps;
 import org.apache.log4j.Logger;
 import org.cloudfoundry.doppler.Envelope;
 import org.cloudfoundry.doppler.EventType;
@@ -39,7 +43,12 @@ public class CfFirehoseMonitorTask implements Runnable {
         CfProperties properties = new CfProperties();
         properties.setHost((String) cf.get("host"));
         properties.setUser((String) cf.get("user"));
-        properties.setPassword((String) cf.get("password"));
+
+        String password = (String) cf.get("password");
+        String encryptedPassword = (String) cf.get("encryptedPassword");
+        String encryptionKey = (String) monitorConfiguration.getConfigYml().get("encryptionKey");
+        
+        properties.setPassword(getPassword(password, encryptedPassword, encryptionKey));
         properties.setSkipSslValidation((Boolean) cf.get("skipSslValidation"));
         String metricPathComponents = (String) monitorConfiguration.getConfigYml().get("metricPathComponents");
 
@@ -54,5 +63,27 @@ public class CfFirehoseMonitorTask implements Runnable {
                         .subscriptionId(UUID.randomUUID().toString()).build());
 
         cfEvents.filter(e -> e.getEventType().equals(EventType.VALUE_METRIC)).subscribe(new FirehoseConsumer(monitorConfiguration.getMetricPrefix(), monitorConfiguration.getMetricWriter(), metricPathComponents));
+    }
+
+    private String getPassword(String password, String encryptedPassword, String encryptionKey) {
+
+        if (!Strings.isNullOrEmpty(password)) {
+            return password;
+        } else {
+            try {
+                Map<String, String> args = Maps.newHashMap();
+                args.put(TaskInputArgs.PASSWORD_ENCRYPTED, encryptedPassword);
+                args.put(TaskInputArgs.ENCRYPTION_KEY, encryptionKey);
+                return CryptoUtil.getPassword(args);
+            } catch (IllegalArgumentException e) {
+                String msg = "Encryption Key not specified. Please set the value in config.yml.";
+                logger.error(msg);
+                throw new IllegalArgumentException(msg, e);
+            } catch (Exception e) {
+                String msg = "Error decrypting password";
+                logger.error(msg, e);
+                throw new RuntimeException(msg, e);
+            }
+        }
     }
 }

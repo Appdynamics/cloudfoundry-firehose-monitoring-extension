@@ -10,8 +10,11 @@ numberOfThreads : 2
 cf:
   - host: api.bosh-lite.com
     user: admin
-    password: admin
+    password:
+    encryptedPassword: UmDiudSXVAUSA0ZAT6ycZw==
     skipSslValidation: true
+
+encryptionKey: Hello
 
 #Supported Values are ORIGIN, DEPLOYMENT and JOB separated by |. Default is ORIGIN|DEPLOYMENT|JOB
 #You can change the order or remove one if not needed. DEPLOYMENT|JOB is a valid input.

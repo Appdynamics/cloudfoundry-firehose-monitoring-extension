@@ -114,14 +114,12 @@ public class CfFirehoseMonitor extends AManagedMonitor {
         ca.setLayout(new PatternLayout("%-5p [%t]: %m%n"));
 
         logger.getRootLogger().addAppender(ca);
-
-
+        
         CfFirehoseMonitor monitor = new CfFirehoseMonitor();
 
         Map<String, String> taskArgs = new HashMap<>();
         taskArgs.put(CONFIG_ARG, "/Users/Muddam/AppDynamics/Code/extensions/cloudfoundry-firehose-monitoring-extension/src/main/resources/config.yaml");
 
         monitor.execute(taskArgs, null);
-
     }
 }
