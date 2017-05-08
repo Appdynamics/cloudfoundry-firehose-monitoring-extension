@@ -41,7 +41,7 @@ public class CfFirehoseMonitorTask implements Runnable {
         properties.setUser((String) cf.get("user"));
         properties.setPassword((String) cf.get("password"));
         properties.setSkipSslValidation((Boolean) cf.get("skipSslValidation"));
-
+        String metricPathComponents = (String) monitorConfiguration.getConfigYml().get("metricPathComponents");
 
         DefaultConnectionContext connectionContext = FirehoseClientConfiguration.connectionContext(properties);
         PasswordGrantTokenProvider tokenProvider = FirehoseClientConfiguration.tokenProvider(properties);
@@ -53,6 +53,6 @@ public class CfFirehoseMonitorTask implements Runnable {
                         .builder()
                         .subscriptionId(UUID.randomUUID().toString()).build());
 
-        cfEvents.filter(e -> e.getEventType().equals(EventType.VALUE_METRIC)).subscribe(new FirehoseConsumer(monitorConfiguration.getMetricPrefix(), monitorConfiguration.getMetricWriter()));
+        cfEvents.filter(e -> e.getEventType().equals(EventType.VALUE_METRIC)).subscribe(new FirehoseConsumer(monitorConfiguration.getMetricPrefix(), monitorConfiguration.getMetricWriter(), metricPathComponents));
     }
 }

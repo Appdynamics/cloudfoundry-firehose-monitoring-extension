@@ -26,7 +26,7 @@ public class CfFirehoseMonitor extends AManagedMonitor {
 
 
     private static final String CONFIG_ARG = "config-file";
-    private static final String METRIC_PREFIX = "Custom Metrics|CF";
+    private static final String METRIC_PREFIX = "Custom Metrics|CloudFoundry";
 
     static MonitorConfiguration configuration;
     private boolean initialized;

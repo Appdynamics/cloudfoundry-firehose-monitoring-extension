@@ -26,11 +26,25 @@ public class FirehoseConsumerTest {
     @Test
     public void testAccept() throws Exception {
 
-        FirehoseConsumer firehoseConsumer = new FirehoseConsumer("Custom Metrics|Firehose", mockMetricWriterHelper);
+        FirehoseConsumer firehoseConsumer = new FirehoseConsumer("Custom Metrics|Firehose", mockMetricWriterHelper, "ORIGIN|DEPLOYMENT|JOB");
 
         ValueMetric valueMetric = ValueMetric.builder().name("Test Metric").value(100d).unit("abc").build();
 
-        Envelope envelope = Envelope.builder().deployment("Test Deployment").job("Test Job").valueMetric(valueMetric).eventType(EventType.VALUE_METRIC).origin("abc").build();
+        Envelope envelope = Envelope.builder().deployment("Test Deployment").job("Test Job").valueMetric(valueMetric).eventType(EventType.VALUE_METRIC).origin("Test Origin").build();
+
+        firehoseConsumer.accept(envelope);
+
+        Mockito.verify(mockMetricWriterHelper).printMetric(Mockito.eq("Custom Metrics|Firehose|Test Origin|Test Deployment|Test Job|Test Metric"), eq(BigDecimal.valueOf(valueMetric.value())), eq("OBS.CUR.COL"));
+    }
+
+    @Test
+    public void testAcceptWithoutOrigin() throws Exception {
+
+        FirehoseConsumer firehoseConsumer = new FirehoseConsumer("Custom Metrics|Firehose", mockMetricWriterHelper, "DEPLOYMENT|JOB");
+
+        ValueMetric valueMetric = ValueMetric.builder().name("Test Metric").value(100d).unit("abc").build();
+
+        Envelope envelope = Envelope.builder().deployment("Test Deployment").job("Test Job").valueMetric(valueMetric).eventType(EventType.VALUE_METRIC).origin("Test Origin").build();
 
         firehoseConsumer.accept(envelope);
 
