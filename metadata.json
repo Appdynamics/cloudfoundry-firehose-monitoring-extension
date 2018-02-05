@@ -3,8 +3,8 @@
 	"type" : "monitor",
 	"displayName" : "Pivotal Cloud Foundry Monitoring Extension",
 	"description" : "An AppDynamics machine agent extension to provide metrics from Pivotal Cloud Foundry.",
-	"version" : "2.0.1",
-	"downloadLink" : "https://github.com/Appdynamics/cloudfoundry-firehose-monitoring-extension/releases/download/v2.0.1/CloudFoundryMonitor-v2.0.1.zip",
+	"version" : "1.0.1",
+	"downloadLink" : "https://github.com/Appdynamics/cloudfoundry-firehose-monitoring-extension/releases/download/v1.0.1/FirehoseMonitor-1.0.1.zip",
 	"imageLink" : "https://www.appdynamics.com/media/uploaded-images/1517764846/pcf.png",
 	"configs" : [
 		{
