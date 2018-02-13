@@ -164,7 +164,7 @@
                         <phase>install</phase>
                         <configuration>
                             <target>
-                                <property name="target.dir" value="${project.build.directory}/FirehoseMonitor"/>
+                                <property name="target.dir" value="${project.build.directory}/PCFMonitor"/>
                                 <mkdir dir="${target.dir}"/>
                                 <copy todir="${target.dir}">
                                     <fileset dir="src/main/resources" includes="monitor.xml"/>
@@ -176,7 +176,7 @@
                                              includes="${project.artifactId}.${project.packaging}"/>
                                 </copy>
                                 <zip destfile="${target.dir}-${project.version}.zip">
-                                    <zipfileset dir="${target.dir}" filemode="755" prefix="FirehoseMonitor"/>
+                                    <zipfileset dir="${target.dir}" filemode="755" prefix="PCFMonitor"/>
                                 </zip>
                                 <delete dir="${target.dir}"/>
                             </target>

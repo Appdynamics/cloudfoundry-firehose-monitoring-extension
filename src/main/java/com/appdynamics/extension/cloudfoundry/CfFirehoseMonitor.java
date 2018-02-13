@@ -118,7 +118,7 @@ public class CfFirehoseMonitor extends AManagedMonitor {
         CfFirehoseMonitor monitor = new CfFirehoseMonitor();
 
         Map<String, String> taskArgs = new HashMap<>();
-        taskArgs.put(CONFIG_ARG, "/Users/Muddam/AppDynamics/Code/extensions/cloudfoundry-firehose-monitoring-extension/src/main/resources/config.yaml");
+        taskArgs.put(CONFIG_ARG, "/Users/bhuvnesh.kumar/repos/appdynamics/extensions/cloudfoundry-firehose-monitoring-extension/src/main/resources/config.yaml");
 
         monitor.execute(taskArgs, null);
     }
