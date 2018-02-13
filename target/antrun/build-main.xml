@@ -11,7 +11,7 @@
   <copy todir="${target.dir}">
     <fileset includes="firehose-monitoring-extension.jar" dir="/Users/bhuvnesh.kumar/repos/appdynamics/extensions/cloudfoundry-firehose-monitoring-extension/target"/>
   </copy>
-  <zip destfile="${target.dir}-1.0.1.zip">
+  <zip destfile="${target.dir}-1.0.2.zip">
     <zipfileset prefix="PCFMonitor" filemode="755" dir="${target.dir}"/>
   </zip>
   <delete dir="${target.dir}"/>
