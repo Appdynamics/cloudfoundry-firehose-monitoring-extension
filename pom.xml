@@ -169,7 +169,7 @@
                                 <copy todir="${target.dir}">
                                     <fileset dir="src/main/resources" includes="monitor.xml"/>
                                     <fileset dir="src/main/resources" includes="application.yaml"/>
-                                    <fileset dir="src/main/resources" includes="config.yaml"/>
+                                    <fileset dir="src/main/resources" includes="config.yml"/>
                                 </copy>
                                 <copy todir="${target.dir}">
                                     <fileset dir="${project.build.directory}"
