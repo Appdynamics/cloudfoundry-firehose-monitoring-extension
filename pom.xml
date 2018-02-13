@@ -5,7 +5,7 @@
 
     <groupId>com.appdynamics.extensions</groupId>
     <artifactId>firehose-monitoring-extension</artifactId>
-    <version>1.0.2</version>
+    <version>1.0.3</version>
     <packaging>jar</packaging>
 
     <name>firehose-monitoring-extension</name>
