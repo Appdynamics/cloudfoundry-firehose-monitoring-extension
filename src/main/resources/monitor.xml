@@ -15,7 +15,7 @@
         <execution-timeout-in-secs>120</execution-timeout-in-secs>
         <task-arguments>
             <!-- config file-->
-            <argument name="config-file" is-required="true" default-value="monitors/PCFMonitor/config.yaml"/>
+            <argument name="config-file" is-required="true" default-value="monitors/PCFMonitor/config.yml"/>
         </task-arguments>
         <java-task>
             <classpath>firehose-monitoring-extension.jar</classpath>
