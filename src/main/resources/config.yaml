@@ -8,7 +8,7 @@ metricPrefix: Server|Component:<TIER NAME OR TIER ID>|Custom Metrics|CloudFoundr
 numberOfThreads : 2
 
 cf:
-  - host: api.bosh-lite.com
+  - host: api.local.pcfdev.io
     user: admin
     password:
     encryptedPassword: UmDiudSXVAUSA0ZAT6ycZw==
