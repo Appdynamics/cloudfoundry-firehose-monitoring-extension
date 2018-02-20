@@ -19,14 +19,14 @@ For eg.
 
 ## Installation ##
 
-1. Run "mvn clean install" and find the FirehoseMonitor-<version>.zip file in the "target" folder. You can also download the FirehoseMonitor-<version>.zip from [AppDynamics Exchange][].
-2. Unzip as "FirehoseMonitor" and copy the "FirehoseMonitor" directory to `<MACHINE_AGENT_HOME>/monitors`
+1. Run "mvn clean install" and find the PCFMonitor-<version>.zip file in the "target" folder. You can also download the PCFMonitor-<version>.zip from [AppDynamics Exchange][].
+2. Unzip as "PCFMonitor" and copy the "PCFMonitor" directory to `<MACHINE_AGENT_HOME>/monitors`
   
 # Configuration ##
 
 Note : Please make sure to not use tab (\t) while editing yaml files. You may want to validate the yaml file using a [yaml validator](http://yamllint.com/)
 
-1. Configure the Cloud Foundry instances by editing the config.yaml file in `<MACHINE_AGENT_HOME>/monitors/FirehoseMonitor/`.
+1. Configure the Cloud Foundry instances by editing the config.yaml file in `<MACHINE_AGENT_HOME>/monitors/PCFMonitor/`.
 2. Below is the default config.yaml
    
 ```
@@ -80,7 +80,7 @@ To use the workbench
 * Follow all the installation steps
 * Start the workbench with the command
 ~~~
-  java -jar /path/to/MachineAgent/monitors/FirehoseMonitor/firehose-monitoring-extension.jar
+  java -jar /path/to/MachineAgent/monitors/PCFMonitor/firehose-monitoring-extension.jar
   This starts an http server at http://host:9090/. This can be accessed from the browser.
 ~~~
 * If the server is not accessible from outside/browser, you can use the following end points to see the list of registered metrics and errors.
