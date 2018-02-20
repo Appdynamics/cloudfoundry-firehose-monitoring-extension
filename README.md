@@ -71,6 +71,28 @@ To avoid setting the clear text password in the config.yaml, please follow the p
 `java -cp appd-exts-commons-1.1.2.jar com.appdynamics.extensions.crypto.Encryptor encryptionKey myPassword`
 3. Specify the encryptedPassword and encryptionKey in config.yaml    
 
+## Workbench ##
+
+Workbench is a feature by which you can preview the metrics before registering it with the controller. This is useful if you want to fine tune the configurations. Workbench is embedded into the extension jar.
+
+To use the workbench
+
+* Follow all the installation steps
+* Start the workbench with the command
+~~~
+  java -jar /path/to/MachineAgent/monitors/FirehoseMonitor/firehose-monitoring-extension.jar
+  This starts an http server at http://host:9090/. This can be accessed from the browser.
+~~~
+* If the server is not accessible from outside/browser, you can use the following end points to see the list of registered metrics and errors.
+~~~
+    #Get the stats
+    curl http://localhost:9090/api/stats
+    #Get the registered metrics
+    curl http://localhost:9090/api/metric-paths
+~~~
+* You can make the changes to config.yml and validate it from the browser or the API
+* Once the configuration is complete, you can kill the workbench and start the Machine Agent
+
 ## Contributing ##
 
 Always feel free to fork and contribute any changes directly via [GitHub][].
